@@ -10,12 +10,18 @@ public class EmailService {
     private JavaMailSender mailSender;
 
     public void sendEmail(String to, String subject, String body){
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(to);
-        message.setSubject(subject);
-        message.setText(body);
-
-        mailSender.send(message);
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(to);
+            message.setSubject(subject);
+            message.setText(body);
+            System.out.println(to);
+            System.out.println(subject);
+            mailSender.send(message);
+        }
+        catch(Exception e){
+            System.out.println(e);
+        }
     }
 
 }

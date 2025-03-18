@@ -4,6 +4,7 @@ import com.example.Address.Book.dto.*;
 import com.example.Address.Book.interfaces.IAuthInterface;
 import com.example.Address.Book.services.EmailService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
