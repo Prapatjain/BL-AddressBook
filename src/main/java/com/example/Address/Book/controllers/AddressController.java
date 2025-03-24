@@ -1,10 +1,12 @@
 package com.example.Address.Book.controllers;
 
 import java.util.*;
-import com.example.Address.Book.dto.EmployeeDTO;
+import com.example.Address.Book.dto.ContactDTO;
 import com.example.Address.Book.dto.ResponseDTO;
-import com.example.Address.Book.interfaces.IEmployeeService;
+import com.example.Address.Book.interfaces.IContactService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -17,12 +19,12 @@ public class AddressController {
     ObjectMapper obj = new ObjectMapper();
 
     @Autowired
-    IEmployeeService iEmployeeService;
+    IContactService iContactService;
 
     //UC1 --> REST API's handled using responseDTO(without interference of service layer)
 
     @GetMapping("/res/get/{id}")
-    public ResponseDTO get1(@PathVariable Long id){
+    public ResponseDTO get1(@Valid @PathVariable Long id){
 
         log.info("Employee tried to get with id: {}", id);
 
@@ -30,9 +32,9 @@ public class AddressController {
     }
 
     @PostMapping("/res/create")
-    public ResponseDTO create1(@RequestBody EmployeeDTO user) throws Exception{
+    public ResponseDTO create1(@Valid @RequestBody ContactDTO user){
 
-        log.info("Employee tried to create with body: {}", obj.writeValueAsString(user));
+        log.info("Employee tried to create with body: {}", getJSON(user));
 
         return new ResponseDTO("API triggered at /res/create", "Success");
     }
@@ -46,15 +48,15 @@ public class AddressController {
     }
 
     @PutMapping("/res/edit/{id}")
-    public ResponseDTO edit1(@RequestBody EmployeeDTO user, @PathVariable Long id) throws Exception{
+    public ResponseDTO edit1(@Valid @RequestBody ContactDTO user, @Valid @PathVariable Long id){
 
-        log.info("Employee tried to edit with id : {} and body : {}", id, obj.writeValueAsString(user));
+        log.info("Employee tried to edit with id : {} and body : {}", id, getJSON(user));
 
         return new ResponseDTO("API triggered at /res/edit/{id}", "Success");
     }
 
     @DeleteMapping("/res/delete/{id}")
-    public ResponseDTO delete1(@PathVariable Long id){
+    public ResponseDTO delete1(@Valid @PathVariable Long id){
 
         log.info("Employee tried to delete with id: {}", id);
 
@@ -64,19 +66,19 @@ public class AddressController {
     //UC2 --> Handling REST API's using Service layer without storing in DB
 
     @GetMapping("/res2/get/{id}")
-    public ResponseDTO get2(@PathVariable Long id){
+    public ResponseDTO get2(@Valid @PathVariable Long id){
 
         log.info("Employee tried to get with id: {}", id);
 
-        return iEmployeeService.response("API triggered at /res/get/{id}", "Success");
+        return iContactService.response("API triggered at /res/get/{id}", "Success");
     }
 
     @PostMapping("/res2/create")
-    public ResponseDTO create2(@RequestBody EmployeeDTO user) throws Exception{
+    public ResponseDTO create2(@Valid @RequestBody ContactDTO user){
 
-        log.info("Employee tried to create with body: {}", obj.writeValueAsString(user));
+        log.info("Employee tried to create with body: {}", getJSON(user));
 
-        return iEmployeeService.response("API triggered at /res/create", "Success");
+        return iContactService.response("API triggered at /res/create", "Success");
     }
 
     @GetMapping("/res2/getAll")
@@ -84,71 +86,81 @@ public class AddressController {
 
         log.info("Employee tried to getAll");
 
-        return iEmployeeService.response("API triggered at /res/getAll", "Success");
+        return iContactService.response("API triggered at /res/getAll", "Success");
     }
 
     @PutMapping("/res2/edit/{id}")
-    public ResponseDTO edit2(@RequestBody EmployeeDTO user, @PathVariable Long id) throws Exception{
+    public ResponseDTO edit2(@Valid @RequestBody ContactDTO user,@Valid @PathVariable Long id){
 
-        log.info("Employee tried to edit with id : {} and body : {}", id, obj.writeValueAsString(user));
+        log.info("Employee tried to edit with id : {} and body : {}", id, getJSON(user));
 
-        return iEmployeeService.response("API triggered at /res/edit/{id}", "Success");
+        return iContactService.response("API triggered at /res/edit/{id}", "Success");
     }
 
     @DeleteMapping("/res2/delete/{id}")
-    public ResponseDTO delete2(@PathVariable Long id){
+    public ResponseDTO delete2(@Valid @PathVariable Long id){
 
         log.info("Employee tried to delete with id: {}", id);
 
-        return iEmployeeService.response("API triggered at /res/delete/{id}", "Success");
+        return iContactService.response("API triggered at /res/delete/{id}", "Success");
     }
 
     //UC3 --> Handling REST API's using service layer with storage in database
 
     @GetMapping("/get/{id}")
-    public EmployeeDTO get3(@PathVariable Long id) throws Exception{
+    public ContactDTO get3(@Valid @PathVariable Long id){
 
         log.info("Employee tried to get with id: {}", id);
 
-        return iEmployeeService.get(id);
+        return iContactService.get(id);
     }
 
     @PostMapping("/create")
-    public EmployeeDTO create3(@RequestBody EmployeeDTO user) throws Exception{
+    public ContactDTO create3(@Valid @RequestBody ContactDTO user){
 
-        log.info("Employee tried to create with body: {}", obj.writeValueAsString(user));
+        log.info("Employee tried to create with body: {}", getJSON(user));
 
-        return iEmployeeService.create(user);
+        return iContactService.create(user);
     }
 
     @GetMapping("/getAll")
-    public List<EmployeeDTO> getAll3(){
+    public List<ContactDTO> getAll3(){
 
         log.info("Employee tried to getAll");
 
-        return iEmployeeService.getAll();
+        return iContactService.getAll();
     }
 
     @PutMapping("/edit/{id}")
-    public EmployeeDTO edit3(@RequestBody EmployeeDTO user, @PathVariable Long id) throws Exception{
+    public ContactDTO edit3(@Valid @RequestBody ContactDTO user,@Valid @PathVariable Long id){
 
-        log.info("Employee tried to edit with id : {} and body : {}", id, obj.writeValueAsString(user));
+        log.info("Employee tried to edit with id : {} and body : {}", id, getJSON(user));
 
-        return iEmployeeService.edit(user, id);
+        return iContactService.edit(user, id);
     }
 
     @DeleteMapping("/delete/{id}")
-    public String delete3(@PathVariable Long id){
+    public String delete3(@Valid @PathVariable Long id){
 
         log.info("Employee tried to delete with id: {}", id);
 
-        return iEmployeeService.delete(id);
+        return iContactService.delete(id);
     }
 
     @GetMapping("/clear")
     public String clear(){
-        return iEmployeeService.clear();
+        return iContactService.clear();
     }
 
+    public String getJSON(Object object){
+        try {
+            ObjectMapper obj = new ObjectMapper();
+            return obj.writeValueAsString(object);
+        }
+        catch(JsonProcessingException e){
+            log.error("Reason : {} Exception : {}", "Conversion error from Java Object to JSON");
+        }
+        return null;
+    }
 
 }
