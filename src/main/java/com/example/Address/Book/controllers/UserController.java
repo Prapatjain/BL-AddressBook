@@ -26,7 +26,7 @@ public class UserController {
     @PostMapping(path = "/register")
     public String register(@Valid @RequestBody AuthUserDTO user){
 
-        log.info("Employee tried to register with body: {}", getJSON(user));
+        log.info("User tried to register with body: {}", getJSON(user));
 
         return iAuthInterface.register(user);
     }
@@ -35,7 +35,7 @@ public class UserController {
     @PostMapping(path ="/login")
     public String login(@Valid @RequestBody LoginDTO user, HttpServletResponse response){
 
-        log.info("Employee tried to login with body: {}", getJSON(user));
+        log.info("User tried to login with body: {}", getJSON(user));
 
         return iAuthInterface.login(user, response);
     }
@@ -44,7 +44,7 @@ public class UserController {
     @PostMapping(path = "/sendMail")
     public String sendMail(@Valid @RequestBody MailDTO message) {
 
-        log.info("Employee tried to send email with body: {}", getJSON(message));
+        log.info("User tried to send email with body: {}", getJSON(message));
 
         emailService.sendEmail(message.getTo(), message.getSubject(), message.getBody());
 
@@ -58,7 +58,7 @@ public class UserController {
     @PutMapping("/forgotPassword/{email}")
     public AuthUserDTO forgotPassword(@Valid @RequestBody PassDTO pass, @Valid @PathVariable String email){
 
-        log.info("Employee applied for forgot password with body: {}", getJSON(pass));
+        log.info("User applied for forgot password with body: {}", getJSON(pass));
 
         return iAuthInterface.forgotPassword(pass, email);
     }
@@ -67,11 +67,18 @@ public class UserController {
     @PutMapping("/resetPassword/{email}")
     public String resetPassword(@Valid @PathVariable String email ,@Valid @RequestParam String currentPass,@Valid @RequestParam String newPass){
 
-        log.info("Employee applied for forgot password with email: {}", email);
+        log.info("User applied for forgot password with email: {}", email);
 
         return iAuthInterface.resetPassword(email, currentPass, newPass);
     }
 
+    @PostMapping(path = "/Logout")
+    public String logout(HttpServletRequest request, HttpServletResponse response){
+
+        log.info("User trie to logout");
+
+        return iAuthInterface.logout(request, response);
+    }
 
     @GetMapping("/clear")
     public String clear(){

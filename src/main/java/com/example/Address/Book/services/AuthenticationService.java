@@ -29,7 +29,7 @@ public class AuthenticationService implements IAuthInterface {
     UserRepository userRepository;
 
     @Autowired
-    EmailService emailService;
+    MessageProducer messageProducer;    //RabbitMq Message Producer
 
     @Autowired
     JwtTokenService jwtTokenService;
@@ -61,8 +61,9 @@ public class AuthenticationService implements IAuthInterface {
 
             log.info("User saved in database : {}", getJSON(newUser));
 
-            //sending the confirmation mail to the user
-            emailService.sendEmail(user.getEmail(), "Your Account is Ready!", "UserName : " + user.getFirstName() + " " + user.getLastName() + "\nEmail : " + user.getEmail() + "\nYou are registered!\nBest Regards,\nBridgelabz Team");
+            //sending the custom message to Message Producer
+            String customMessage = "REGISTER|"+user.getEmail()+"|"+user.getFirstName();
+            messageProducer.sendMessage(customMessage);
 
             return "user registered";
         }
@@ -137,7 +138,9 @@ public class AuthenticationService implements IAuthInterface {
 
             userRepository.save(foundUser);
 
-            emailService.sendEmail(email, "Password Forgot Status", "Your password has been changed!");
+            //sending the custom message to Message Producer
+            String customMessage = "FORGOT|"+foundUser.getEmail()+"|"+foundUser.getFirstName();
+            messageProducer.sendMessage(customMessage);
 
             AuthUserDTO resDto = new AuthUserDTO(foundUser.getFirstName(), foundUser.getLastName(), foundUser.getEmail(), foundUser.getPassword(), foundUser.getId());
 
@@ -167,10 +170,42 @@ public class AuthenticationService implements IAuthInterface {
 
         log.info("Hashpassword : {} for password : {} saved for user : {}", hashpass, newPass, getJSON(foundUser));
 
-        emailService.sendEmail(email, "Password reset status", "Your password is reset successfully");
+        String customMessage = "RESET|"+foundUser.getEmail()+"|"+foundUser.getFirstName();
+        messageProducer.sendMessage(customMessage);
 
         return "Password reset successfull!";
 
+    }
+
+    public String logout(HttpServletRequest request, HttpServletResponse response){
+
+        Cookie foundCookie = null;
+
+        if(request.getCookies() ==  null)
+            return "user not logged in";
+
+        for(Cookie c : request.getCookies()){
+            if(c.getName().equals("jwt")){
+                foundCookie = c;
+                break;
+            }
+        }
+        if(foundCookie == null)
+            return "user not logged in";
+
+        ResponseCookie expiredCookie = ResponseCookie.from("jwt", "")
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(0)
+                .sameSite("Lax")
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, expiredCookie.toString());
+
+        redisTokenService.deleteToken(jwtTokenService.decodeToken(foundCookie.getValue()).toString());
+
+        return "You are logged out";
     }
 
     public String clear(){
