@@ -27,4 +27,13 @@ public class ContactDTO {
 
     Long id;
 
+    public ContactDTO(String name, String email, Long phoneNumber, String address) {
+        this.name = name;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        Address = address;
+    }
+
+
+
 }

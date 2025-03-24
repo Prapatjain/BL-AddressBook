@@ -4,7 +4,7 @@ public class PassDTO {
 
     String password;
 
-    PassDTO(String password){
+    public PassDTO(String password){
         this.password = password;
     }
 

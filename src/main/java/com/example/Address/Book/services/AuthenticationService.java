@@ -61,7 +61,7 @@ public class AuthenticationService implements IAuthInterface {
 
             log.info("User saved in database : {}", getJSON(newUser));
 
-            //sending the custom message to Message Producer
+            //sending the custom message to Message Producer( Rabbit MQ)
             String customMessage = "REGISTER|"+user.getEmail()+"|"+user.getFirstName();
             messageProducer.sendMessage(customMessage);
 
@@ -116,7 +116,7 @@ public class AuthenticationService implements IAuthInterface {
             return "user logged in" + "\ntoken : " + token;
         }
         catch(RuntimeException e){
-            log.error("User already registered with email: {} Exception : {}", user.getEmail(), e);
+            log.error("User not registered with email: {} Exception : {}", user.getEmail(), e);
         }
         return null;
 
@@ -230,18 +230,3 @@ public class AuthenticationService implements IAuthInterface {
 
 
 }
-
-
-
-
-//
-////store the token generated in cookies
-//ResponseCookie resCookie = ResponseCookie.from("token", token)
-//        .httpOnly(true)
-//        .secure(false)      //set to true but for local host set it to false as local host sent with HTTP request
-//        .path("/")
-//        .maxAge(3600)
-//        .sameSite("Strict")
-//        .build();
-//
-//            response.addHeader(HttpHeaders.SET_COOKIE, resCookie.toString());
